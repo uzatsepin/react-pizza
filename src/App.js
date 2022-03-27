@@ -1,36 +1,46 @@
-import { Header } from './Components';
-import { Home, Cart } from './pages';
+import {Header} from './Components';
+import {Cart, Home} from './pages';
 import './scss/app.scss';
-import { Routes, Route } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import {Route, Routes} from 'react-router-dom';
+import {useEffect} from 'react';
 import axios from 'axios';
+import {useDispatch} from 'react-redux';
+import {setPizzas} from "./redux/actions/pizzas";
 
 function App() {
-  const [pizzas, setPizzas] = useState([]);
+  const dispatch = useDispatch();
+
 
   useEffect(() => {
-    async function getPizzas() {
-      try {
-        const response = await axios.get('http://localhost:3000/db.json');
-        setPizzas(response.data.pizzas);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    getPizzas();
-  }, []);
-
+    axios.get('http://localhost:3000/db.json').then(({data}) => {
+      dispatch(setPizzas(data.pizzas));
+    })
+  })
   return (
-    <div className="wrapper">
-      <Header />
-      <div className="content">
-        <Routes>
-          <Route path="/" element={<Home items={pizzas} />} exact />
-          <Route path="/cart" element={<Cart />} exact />
-        </Routes>
+      <div className="wrapper">
+        <Header/>
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Home />} exact/>
+            <Route path="/cart" element={<Cart />} exact/>
+          </Routes>
+        </div>
       </div>
-    </div>
-  );
+  )
 }
 
 export default App;
+
+// export default connect (
+//     (state) => {
+//       return {
+//         items: state.pizzas.items,
+//         filter: state.filters,
+//       };
+//     },
+//     (dispatch) => {
+//       return {
+//         setPizzas: (items) => dispatch(setPizzas(items)),
+//       }
+//     }
+// )(App);
